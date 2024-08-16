@@ -1,0 +1,63 @@
+version: '3.9'
+services:
+
+  db:
+    container_name: import_csv_db
+    build:
+      context: postgres/
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    command: ["postgres", "-c", "log_statement=all", "-c", "log_duration=on", "-c", "log_destination=stderr"]
+    volumes:
+      - import_csv_db:/var/lib/postgresql/data
+    networks:
+      - proxy
+
+  pgbouncer:
+    container_name: import_csv_pgbouncer
+    build:
+      context: pgbouncer/
+    restart: always
+    env_file: .env
+    ports:
+      - '6432:6432'
+    environment:
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - PGBOUNCER_PASSWORD=${PGBOUNCER_PASSWORD}
+      - PGBOUNCER_USER=${PGBOUNCER_USER}
+      - DB_HOST=db
+      - DB_NAME=${POSTGRES_DB}
+      - POOL_MODE=transaction
+      - AUTH_QUERY='SELECT * FROM pgbouncer.get_auth($$1)'
+      - AUTH_USER=${PGBOUNCER_USER}
+      - AUTH_USERS=${PGBOUNCER_USER},${POSTGRES_USER}
+      - MAX_CLIENT_CONN=400
+      - DEFAULT_POOL_SIZE=50
+      - RESERVE_POOL_SIZE=10
+      - MAX_DB_CONNECTIONS=100
+      - LISTEN_PORT=6432
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - proxy
+
+networks:
+  proxy:
+
+volumes:
+  import_csv_db:

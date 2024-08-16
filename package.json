@@ -1,0 +1,29 @@
+{
+  "name": "import-export-csv-node-postgres",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "rm -rf dist && node --loader ts-node/esm build.ts",
+    "dev": "nodenv -E .env --exec \"nodemon --ext ts --exec 'node --import ./ts-node.register.mjs ./src/index.ts'\"",
+    "start": "nodenv -E .env --exec \"node dist/index.js\"",
+    "start-prod": "node dist/index.js"
+  },
+  "dependencies": {
+    "node-env-run": "^4.0.2",
+    "pg": "^8.12.0",
+    "pg-copy-streams": "^6.0.6",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^16.18.101",
+    "@types/pg": "^8.11.6",
+    "@types/pg-copy-streams": "^1.2.5",
+    "esbuild": "^0.23.0",
+    "esbuild-plugin-copy": "^2.1.1",
+    "nodemon": "^3.1.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^4.9.5"
+  }
+}
