@@ -25,7 +25,7 @@ LOG:  duration: 1282.590 ms
 ## Export to CSV 1 mil benchmark with UUID
 
 ```bash
-LOG:  statement: COPY users TO STDOUT WITH (FORMAT csv, HEADER, DELIMITER ',', QUOTE '"')
+LOG:  statement: COPY users TO STDOUT WITH (FORMAT csv, HEADER, DELIMITER ';', QUOTE '"')
 LOG:  duration: 576.788 ms
 ```
 
